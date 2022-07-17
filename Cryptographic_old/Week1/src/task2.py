@@ -91,7 +91,7 @@ def use_word_to_decrypt(key_word, en_word, n):
         if i > n-1:
             i = 0
     print(new_sentence)
-    if "crypto" in new_sentence:                                # It's a cryptocourse, so believing that the text would have the word 'crypto' in it. 
+    if "crypto" in new_sentence: # It's a cryptocourse, so believing that the text would have the word 'crypto' in it. 
         input()
 
 def pull_list(link):

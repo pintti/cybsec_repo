@@ -13,6 +13,7 @@ keys = []
 for i in range(len(ciphers)):
     key = solve_key(ciphers[i], ord(letters[i]))
     keys.append(key)
+print(keys)
 
 
 ciphers = []
