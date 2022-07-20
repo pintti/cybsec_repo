@@ -103,3 +103,19 @@ For the code please check out test.c. Below you can also checkout the screenshot
 ---
 
 ## Task 4.
+
+CVE-2014-0160 is also better known as Heartbleed.
+
+The leak happens because of an indirect memory leak in the cryptographic allocation functions. This allows the attacker to read more data than should have been possible.
+
+![AFL Screenshot](ss5.png)
+
+&nbsp;
+
+---
+
+## Task 5.
+
+For this task the target software chosen was [Inkscape](https://inkscape.org/), a vector graphics editor. The program has great coverage of multiple input types and plenty of different functions that can be fuzzed. Inkscape uses a whole heap of different libraries, so many in fact that the test VM took almost one and a half hour just to build the program, even with the fast build option.
+
+The fuzzer used was the AFL-Fuzz used in the other tasks. The fuzzer files used were the ready made image files found on [AFL-Fuzz website](https://lcamtuf.coredump.cx/afl/demo/)
