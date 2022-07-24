@@ -118,4 +118,12 @@ The leak happens because of an indirect memory leak in the cryptographic allocat
 
 For this task the target software chosen was [Inkscape](https://inkscape.org/), a vector graphics editor. The program has great coverage of multiple input types and plenty of different functions that can be fuzzed. Inkscape uses a whole heap of different libraries, so many in fact that the test VM took almost one and a half hour just to build the program, even with the fast build option.
 
-The fuzzer used was the AFL-Fuzz used in the other tasks. The fuzzer files used were the ready made image files found on [AFL-Fuzz website](https://lcamtuf.coredump.cx/afl/demo/)
+The fuzzer used was the AFL-Fuzz used in the other tasks. The fuzzer files used was a funny picture made by myself and a friend. The version of Inkscape that was in use was Inkscape 1.3-dev (9bb0dc3846, 2022-07-20). The virtual machine used for testing is the course machine. 
+
+![The funny picture](unknown.jpg)
+
+The part of the program that was fuzzed was Inkscapes export part where you could export a picture of one type to another. In this case the exporting was from jpg file to png. The fuzzing itself was very slow due to the nature of the program. I left the fuzzer on for around an hour and half and with no crashes, but two unique timeouts, I decided that it was good enough. Pictured below is the final screen of AFL.
+
+![AFL Screenshot](ss6.png)
+
+
