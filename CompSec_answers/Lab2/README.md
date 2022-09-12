@@ -1,5 +1,11 @@
 # Lab 2: Networks and web security
 
+## Instructions
+
+Below is a copy of the questions found in the Network lab folder. Answer the questions here. In task 3 put the server code and the XSS-script to a different file. Also the picture and the report in task 4 can be returned as a separe files.
+
+Note that there is reserved folder for specific tasks.
+
 ## Task 1
 ## Basic SQL Injections
 
@@ -60,4 +66,76 @@ DOM based XSS modifies the users environment, without making any changes to the 
 
 The server should validate inputs on both client and server-side, and all variables should be sanitized or escaped.
 
-## Task 2
+## Task 2 
+
+**'These are not my credentials'**
+
+SQL command
+ ```sql
+ ')) UNION SELECT id, username, email, password, createdAt, updatedAt, deletedAt, password FROM Users--
+
+```
+
+In SQL the UNION operator combines two or more SELECT statements. Thanks to that, it is possible to inject another SELECT command from a different table within the one before, if the field isn't sanitized. The problem for the attacker comes from not knowing how many columns are required for the information to register, but this can be found out by a select number of methods. If the server accepts the command, UNION modifier combines the two results, even if that includes data from tables where the attacker shouldn't be able to access.
+
+
+---
+**Cross-site request forgery**
+
+*Returns:*
+* index.html
+
+---
+
+**Brute forcing**
+
+*Returns:*
+* Wordlist
+* Any code you created.
+* Detailed description on how you created the wordlist and how you did the brute force attack.
+
+---
+
+## Task 3
+
+
+*Returns:*
+
+* Your own server code or a description of how you showed the received data.
+* Your own HTML/Javascript/etc. code **without directory traversal characters in its name**.
+* The *zip* archive that you uploaded to overwrite the subtitle file.
+* **Clear** instructions on how to start your own server, send the XSS attack and how to verify that the information was sent to your server from Juice Shop.
+---
+
+## Task 4
+
+You can complete this task in two ways. You can do the predefined task or you can suggest a task that interests you and do that. __Contact the course assistants__ and describe them what you are interested on doing/trying to do. If they say it is good you can do that as your task 4.
+
+*Return predefined task(s) here or into separate folder. If you chose to implement something own, return them to separate folder.*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
