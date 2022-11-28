@@ -24,10 +24,6 @@ def mutate(word: str):
     return wordlist
 
 
-            
-
-    return wordlist
-
 def letter_change(letter:str):
     if letter in string.ascii_lowercase:
         return string.ascii_uppercase[string.ascii_lowercase.index(letter)]
