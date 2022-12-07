@@ -1,0 +1,1 @@
+This folder is mostly for files used to break and make different encryptions. Used for the course Encryption methods (802336A:3).
