@@ -18,3 +18,10 @@ def raise_to_pow(num: int, makers: list[int], divider: int):
         pows.append((maker, pow(num, maker, divider)))
     return pows
 
+
+def get_public_key(user: int, powed: int, mod: int):
+    return pow(powed, user, mod)
+
+
+def get_together_key(a: int, b: int, mod: int):
+    return pow(a, b, mod)
