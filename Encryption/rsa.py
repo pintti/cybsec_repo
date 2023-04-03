@@ -1,3 +1,5 @@
+import math
+
 finnish = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'å', 'ä', 'ö']
 english = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 
@@ -179,4 +181,25 @@ def rsa_decryption_with_sign(msg_nums: list[int], style: str, e_a: int, n_a: int
     plain_text = get_plain_text(decrypt_msg_num, style)
     print(f"MSG: {decrypt_msg_num}, sender sign: {confirm_sign}")
 
+n1 = 0
+n2 = 1
 
+a = 454
+b = 460
+
+while(n1 != n2):
+    while (a < 1000):
+        n1 = (a**2 - 453**2) / 5
+        n2 = (b**2 - 459**2) / 5
+        print(a, b)
+        if (n1 == n2):
+            print(n1, n2, a, b)
+            input()
+        a+=1
+    b+=1
+    a = 454
+    if (b > 1000):
+        b = 460
+print(n1, a, b)
+
+#-40824.0 -40824.0 33 81
