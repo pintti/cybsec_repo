@@ -1,5 +1,33 @@
 # **Week 4**
 
+## Task 1
+
+Side-channel attacks are attacks that use information that leaks from within the system. This information can be physical characteristics, like sound, power consumption or electromagnetic radiation. Side-channel attacks usually target devices that can be easily accessed, such as mobile devices and embedded systems, but modern side-channel attacks can also be used against VMs and web applications.
+
+Side-channel attacks use a wide variety of information to do their attacks, all depending on the target and the type of attack. Physical information can be electromagnetic radiation or radio waves, that can then be used to reconstruct internal signal within the target device. Power consumption is also usual target information, as that can be used to infer the activity within the system. Timing systems is also a very often used information for side-channel attacks, through which the attacker can predict the victim systems behaviour.
+
+Memory caches can also be abused to do side-channel attacks. Memory caches were used for Spectre and Meltdown vulnerabilities. These two vulnerabilities abused transient execution in CPUs. These were mitigated through patches, which hopefully made attacks impossible. The patches contained BIOS and OS updates, but did not (or rather could not) patch the microarchitectural vulnerabilities which caused the attacks in the first place.
+
+Sources:
+
+https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/WebAppSideChannel-final.pdf
+https://www.techtarget.com/searchsecurity/definition/side-channel-attack
+https://www.techrepublic.com/article/spectre-and-meltdown-explained-a-comprehensive-guide-for-professionals/
+
+## Task 2
+
+Slowloris is a type of DDoS attacks that abuses multiple incomplete HTTP requests to overload the server and prevent any more connections to be made. The attack works by having the attacking machine open up multiple HTTP requests towards the target site. Rather than most high bandwidth attacks, slowloris attempts to make the requests that might seem slower than normal, but are considered otherwise regular traffic. As the target gets the requests, it opens up threads that are trying to stay alive for the requests to complete. As these never complete, the servers connection amount will eventually exceed its capacity and the denial of service will be complete.
+
+Slowloris can be mitigated by limiting the number of concurrent connections from a single IP address, increasing server capacity (although it is likely the attacker will increase their attacks in response), adjusting server timeouts to close incomplete connections quicker and employing load balancers or reverse proxies to distribute the incoming connections. There are also security modules and plugins that can be used to detect and block Slowloris attacks.
+
+Slowloris gained notoriety when it was used during the 2009 Iranian presidential election, where hackivists used slowloris to strike down pro-regime sites. Slowloris was used in addition to regular DDoS attacks, to make sure the sites would stay down.
+
+Sources:
+https://www.netscout.com/what-is-ddos/slowloris-attacks
+https://www.cloudflare.com/learning/ddos/ddos-attack-tools/slowloris/
+https://isc.sans.edu/diary/Slowloris+and+Iranian+DDoS+attacks/6622
+
+
 ## **Task 3**: BurpSuite Introduction
 
 In this exercise we will take a brief look at a popular web security testing tool called BurpSuite. The exercise requires quite a lot of setup and running an intentionally vulnerable web application (although locally), so using a Virtual Linux Machine is heavily recommended. All the following instructions will be for **Linux only**  
